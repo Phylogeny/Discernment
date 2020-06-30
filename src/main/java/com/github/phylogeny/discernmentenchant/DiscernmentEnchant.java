@@ -20,7 +20,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class DiscernmentEnchant
 {
     public static final String MOD_ID = "discernmentenchant";
-    private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MOD_ID);
+    private static final DeferredRegister<Enchantment> ENCHANTMENTS = new DeferredRegister<>(ForgeRegistries.ENCHANTMENTS, MOD_ID);
     private static final RegistryObject<Enchantment> DISCERNMENT = ENCHANTMENTS.register("discernment", DiscernmentEnchantment::new);
 
     public DiscernmentEnchant()
@@ -48,7 +48,7 @@ public class DiscernmentEnchant
     {
         protected DiscernmentEnchantment()
         {
-            super(Rarity.UNCOMMON, EnchantmentType.VANISHABLE, EquipmentSlotType.values());
+            super(Rarity.UNCOMMON, EnchantmentType.ALL, EquipmentSlotType.values());
         }
     }
 }

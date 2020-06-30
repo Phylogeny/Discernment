@@ -20,7 +20,7 @@ archivesBaseName = 'DiscernmentEnchant'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200514-1.16'
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
     runs {
         client {
             workingDirectory project.file('run')

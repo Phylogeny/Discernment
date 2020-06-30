@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[32,)"
+loaderVersion="[31,)"
 logoFile="logo.png"
 [[mods]]
     modId="discernmentenchant"
@@ -18,12 +18,12 @@ This mod adds a discernment enchantment that prevents a living entity (including
 [[dependencies.discernmentenchant]]
     modId="forge"
     mandatory=true
-    versionRange="[32,)"
+    versionRange="[31,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.discernmentenchant]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1,)"
+    versionRange="[1.15.2]"
     ordering="NONE"
     side="BOTH"
