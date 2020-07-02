@@ -5,16 +5,16 @@ logoFile="logo.png"
     modId="discernmentenchant"
     version="${version}"
     displayName="Discernment Enchant"
-	description='''
+    description='''
 This mod adds a discernment enchantment that prevents a living entity (including a player) from damaging any peaceful mob while the following conditions are met:
 1) The entity is wearing an item as armor, or holding an item in their main or off hand, that has this enchantment on it.
 2) The entity is not sneaking.
 '''
-	issueTrackerURL="https://github.com/Phylogeny/DiscernmentEnchant/issues"
-	displayURL="https://www.curseforge.com/minecraft/mc-mods/discernment-enchant"
-	updateJSONURL="https://github.com/Phylogeny/DiscernmentEnchant/raw/1.16.1/update.json"
-	credits=""
-	authors="Phylogeny"
+    issueTrackerURL="https://github.com/Phylogeny/DiscernmentEnchant/issues"
+    displayURL="https://www.curseforge.com/minecraft/mc-mods/discernment-enchant"
+    updateJSONURL="https://github.com/Phylogeny/DiscernmentEnchant/raw/1.16.1/update.json"
+    credits=""
+    authors="Phylogeny"
 [[dependencies.discernmentenchant]]
     modId="forge"
     mandatory=true
