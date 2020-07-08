@@ -1,5 +1,6 @@
 package com.github.phylogeny.discernmentenchant;
 
+import com.google.common.base.Stopwatch;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentType;
@@ -19,6 +20,9 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 @Mod(DiscernmentEnchant.MOD_ID)
 @EventBusSubscriber
@@ -76,9 +80,24 @@ public class DiscernmentEnchant
 
     private static class DiscernmentEffect extends Effect
     {
+        private final Stopwatch timer;
+        private static final int CYCLE_TIME = 2000;
+        private static final int[] COLORS = IntStream.range(0, CYCLE_TIME).map(i ->
+        {
+            int value = Math.max(1, (int)((Math.sin((i % CYCLE_TIME) / (double) CYCLE_TIME * 2 * Math.PI) / 2 + 0.5) * 255 + 0.5));
+            return (value << 16) | (value << 8) | value;
+        }).toArray();
+
         protected DiscernmentEffect()
         {
-            super(EffectType.BENEFICIAL, 0);//TODO color
+            super(EffectType.BENEFICIAL, 0);
+            timer = Stopwatch.createStarted();
+        }
+
+        @Override
+        public int getLiquidColor()
+        {
+            return COLORS[(int) (timer.elapsed(TimeUnit.MILLISECONDS) % CYCLE_TIME)];
         }
     }
 }
