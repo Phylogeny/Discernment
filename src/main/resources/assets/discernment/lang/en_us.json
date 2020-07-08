@@ -1,10 +1,10 @@
 {
     "_comment": "Enchantments",
-    "enchantment.discernmentenchant.discernment": "Discernment",
-    "enchantment.discernmentenchant.discernment.description": "Prevents a living entity (including a player) from damaging any peaceful mob while:\n1) The entity is wearing an item as armor, or holding an item in their main or off hand, that has this enchantment on it.\n2) The entity is not sneaking.",
+    "enchantment.discernment.discernment": "Discernment",
+    "enchantment.discernment.discernment.description": "Prevents a living entity (including a player) from damaging any peaceful mob while:\n1) The entity is wearing an item as armor, or holding an item in their main or off hand, that has this enchantment on it.\n2) The entity is not sneaking.",
 
     "_comment": "Effects",
-    "effect.discernmentenchant.discernment": "Discernment",
+    "effect.discernment.discernment": "Discernment",
 
     "_comment": "Potions",
     "item.minecraft.potion.effect.discernment": "Potion of Discernment",
