@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = minecraft_version + "-" + version
-group = 'com.github.phylogeny.discernmentenchant'
-archivesBaseName = 'DiscernmentEnchant'
+group = 'com.github.phylogeny.discernment'
+archivesBaseName = 'Discernment'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -28,7 +28,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                discernmentenchant {
+                discernment {
                     source sourceSets.main
                 }
             }
@@ -40,7 +40,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                discernmentenchant {
+                discernment {
                     source sourceSets.main
                 }
             }
@@ -51,10 +51,10 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'discernmentenchant', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'discernment', '--all', '--output', file('src/generated/resources/')
 
             mods {
-                discernmentenchant {
+                discernment {
                     source sourceSets.main
                 }
             }
@@ -78,7 +78,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "discernmentenchant",
+            "Specification-Title": "discernment",
             "Specification-Version": "1",
             "Implementation-Title": project.name,
             "Implementation-Version": project.version,

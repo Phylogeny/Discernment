@@ -1,4 +1,4 @@
-package com.github.phylogeny.discernmentenchant;
+package com.github.phylogeny.discernment;
 
 import com.google.common.base.Stopwatch;
 import net.minecraft.enchantment.Enchantment;
@@ -24,11 +24,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-@Mod(DiscernmentEnchant.MOD_ID)
+@Mod(Discernment.MOD_ID)
 @EventBusSubscriber
-public class DiscernmentEnchant
+public class Discernment
 {
-    public static final String MOD_ID = "discernmentenchant";
+    public static final String MOD_ID = "discernment";
     private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MOD_ID);
     private static final DeferredRegister<Effect> EFFECTS = DeferredRegister.create(ForgeRegistries.POTIONS, MOD_ID);
     private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(ForgeRegistries.POTION_TYPES, MOD_ID);
@@ -40,7 +40,7 @@ public class DiscernmentEnchant
         registerDiscernmentPotion("long_discernment", 9600);
     }
 
-    public DiscernmentEnchant()
+    public Discernment()
     {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ENCHANTMENTS.register(bus);

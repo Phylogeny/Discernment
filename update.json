@@ -1,10 +1,10 @@
 {
-  "homepage": "https://www.curseforge.com/minecraft/mc-mods/discernment-enchant",
+  "homepage": "https://www.curseforge.com/minecraft/mc-mods/discernment",
   "1.16.1": {
-    "1.0.0": "Changelog: https://github.com/Phylogeny/DiscernmentEnchant/blob/1.16.1/CHANGELOG.md"
+    "1.0.0": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.16.1/CHANGELOG.md"
   },
   "1.15.2": {
-    "1.0.0": "Changelog: https://github.com/Phylogeny/DiscernmentEnchant/blob/1.15.2/CHANGELOG.md"
+    "1.0.0": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.15.2/CHANGELOG.md"
   },
   "promos": {
     "1.16.1-latest": "1.0.0",
