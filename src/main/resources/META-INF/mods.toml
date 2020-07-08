@@ -6,8 +6,8 @@ logoFile="logo.png"
     version="${version}"
     displayName="Discernment"
     description='''
-This mod adds a discernment enchantment that prevents a living entity (including a player) from damaging any peaceful mob while the following conditions are met:
-1) The entity is wearing an item as armor, or holding an item in their main or off hand, that has this enchantment on it.
+This mod adds a discernment enchantment, effect, and portions that prevents a living entity (including a player) from hurting any peaceful living entities (also including players) while the following conditions are met:
+1) The entity has the effect, or is wearing an item as armor, or holding an item in their main or off hand, that has the enchantment.
 2) The entity is not sneaking.
 '''
     issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
