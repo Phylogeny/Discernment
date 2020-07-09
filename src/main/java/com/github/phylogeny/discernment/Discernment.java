@@ -7,16 +7,20 @@ import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.potion.Potion;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.potion.*;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,11 +38,8 @@ public class Discernment
     private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(ForgeRegistries.POTION_TYPES, MOD_ID);
     private static final RegistryObject<Enchantment> DISCERNMENT_ENCHANT = ENCHANTMENTS.register("discernment", DiscernmentEnchantment::new);
     private static final RegistryObject<Effect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
-    static
-    {
-        registerDiscernmentPotion("discernment", 3600);
-        registerDiscernmentPotion("long_discernment", 9600);
-    }
+    private static final RegistryObject<Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
+    private static final RegistryObject<Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
 
     public Discernment()
     {
@@ -46,11 +47,31 @@ public class Discernment
         ENCHANTMENTS.register(bus);
         EFFECTS.register(bus);
         POTIONS.register(bus);
+        bus.addListener(this::setup);
     }
 
-    private static void registerDiscernmentPotion(String name, int duration)
+    private void setup(FMLCommonSetupEvent event)
     {
-        POTIONS.register(name, () -> new Potion(new EffectInstance(DISCERNMENT_EFFECT.get(), duration)));
+        DeferredWorkQueue.runLater(() ->
+        {
+            addBrewingRecipe(Potions.AWKWARD, Items.EMERALD, DISCERNMENT_POTION);
+            addBrewingRecipe(DISCERNMENT_POTION.get(), Items.REDSTONE, DISCERNMENT_POTION_LONG);
+        });
+    }
+
+    private void addBrewingRecipe(Potion input, Item ingredient, RegistryObject<Potion> output)
+    {
+        BrewingRecipeRegistry.addRecipe(Ingredient.fromStacks(getPotionStack(input)), Ingredient.fromItems(ingredient), getPotionStack(output.get()));
+    }
+
+    private ItemStack getPotionStack(Potion potion)
+    {
+        return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion);
+    }
+
+    private static RegistryObject<Potion> registerDiscernmentPotion(String name, int duration)
+    {
+        return POTIONS.register(name, () -> new Potion(new EffectInstance(DISCERNMENT_EFFECT.get(), duration)));
     }
 
     @SubscribeEvent
