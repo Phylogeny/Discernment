@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[32,)"
-logoFile="logo.png"
+license="Public Domain"
+issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
 [[mods]]
     modId="discernment"
     version="${version}"
@@ -10,11 +11,11 @@ This mod adds a discernment enchantment, effect, and portions that prevents a li
 1) The entity has the effect, or is wearing an item as armor, or holding an item in their main or off hand, that has the enchantment.
 2) The entity is not sneaking.
 '''
-    issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
     displayURL="https://www.curseforge.com/minecraft/mc-mods/discernment"
     updateJSONURL="https://github.com/Phylogeny/Discernment/raw/1.16.1/update.json"
     credits=""
     authors="Phylogeny"
+    logoFile="logo.png"
 [[dependencies.discernment]]
     modId="forge"
     mandatory=true
