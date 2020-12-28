@@ -1,6 +1,10 @@
 # Discernment Changelog
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 12-28-2020
+### Added
+- Missing license info, making the mod additionally 1.16.3-4 compatible
+
 ## [2.0.0] - 7-9-2020
 ### Added
 - Discernment effect
