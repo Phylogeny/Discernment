@@ -1,10 +1,10 @@
 modLoader="javafml"
-loaderVersion="[32,)"
+loaderVersion="[37,)"
 license="Public Domain"
 issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
 [[mods]]
     modId="discernment"
-    version="${version}"
+    version="${file.jarVersion}"
     displayName="Discernment"
     description='''
 This mod adds a discernment enchantment, effect, and portions that prevents a living entity (including a player) from hurting any peaceful living entities (also including players) while the following conditions are met:
@@ -19,12 +19,12 @@ This mod adds a discernment enchantment, effect, and portions that prevents a li
 [[dependencies.discernment]]
     modId="forge"
     mandatory=true
-    versionRange="[32,)"
+    versionRange="[37,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.discernment]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1,)"
+    versionRange="[1.17.1,)"
     ordering="NONE"
     side="BOTH"
