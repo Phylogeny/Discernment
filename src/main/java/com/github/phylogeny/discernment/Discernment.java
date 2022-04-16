@@ -82,13 +82,9 @@ public class Discernment
             return;
 
         Entity source = event.getSource().getEntity();
-        if (!(source instanceof LivingEntity))
-            return;
-
-        LivingEntity entity = (LivingEntity) source;
-        if (source != null && !source.isShiftKeyDown() && (entity.hasEffect(DISCERNMENT_EFFECT.get())
+        if (source instanceof LivingEntity entity && !entity.isShiftKeyDown() && (entity.hasEffect(DISCERNMENT_EFFECT.get())
                 || DISCERNMENT_ENCHANT.get().getSlotItems(entity).values().stream()
-                    .anyMatch(stack -> EnchantmentHelper.getItemEnchantmentLevel(DISCERNMENT_ENCHANT.get(), stack) > 0)))
+                .anyMatch(stack -> EnchantmentHelper.getItemEnchantmentLevel(DISCERNMENT_ENCHANT.get(), stack) > 0)))
             event.setCanceled(true);
     }
 
