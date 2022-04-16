@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[37,)"
+loaderVersion="[40,)"
 license="Public Domain"
 issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
 [[mods]]
@@ -19,12 +19,12 @@ This mod adds a discernment enchantment, effect, and portions that prevents a li
 [[dependencies.discernment]]
     modId="forge"
     mandatory=true
-    versionRange="[37,)"
+    versionRange="[40,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.discernment]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17.1,)"
+    versionRange="[1.18,)"
     ordering="NONE"
     side="BOTH"
