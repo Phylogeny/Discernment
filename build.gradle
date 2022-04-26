@@ -89,12 +89,19 @@ repositories {
         name "Progwml6 maven"
         url  "https://dvs1.progwml6.com/files/maven"
     }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:${configured_file_id}")
 }
 
 jar {
