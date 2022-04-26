@@ -42,8 +42,7 @@ import java.util.stream.IntStream;
 
 @Mod(Discernment.MOD_ID)
 @Mod.EventBusSubscriber
-public class Discernment
-{
+public class Discernment {
     public static final String MOD_ID = "discernment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -55,8 +54,7 @@ public class Discernment
     private static final RegistryObject<Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
     private static final RegistryObject<Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
 
-    public Discernment()
-    {
+    public Discernment() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         Config.register(bus);
         ENCHANTMENTS.register(bus);
@@ -69,31 +67,26 @@ public class Discernment
         return new ResourceLocation(MOD_ID, path);
     }
 
-    private void setup(FMLCommonSetupEvent event)
-    {
+    private void setup(FMLCommonSetupEvent event) {
         PacketNetwork.registerPackets();
         addBrewingRecipe(Potions.AWKWARD, Items.EMERALD, DISCERNMENT_POTION);
         addBrewingRecipe(DISCERNMENT_POTION.get(), Items.REDSTONE, DISCERNMENT_POTION_LONG);
     }
 
-    private void addBrewingRecipe(Potion input, Item ingredient, RegistryObject<Potion> output)
-    {
+    private void addBrewingRecipe(Potion input, Item ingredient, RegistryObject<Potion> output) {
         BrewingRecipeRegistry.addRecipe(Ingredient.of(getPotionStack(input)), Ingredient.of(ingredient), getPotionStack(output.get()));
     }
 
-    private ItemStack getPotionStack(Potion potion)
-    {
+    private ItemStack getPotionStack(Potion potion) {
         return PotionUtils.setPotion(new ItemStack(Items.POTION), potion);
     }
 
-    private static RegistryObject<Potion> registerDiscernmentPotion(String name, int duration)
-    {
+    private static RegistryObject<Potion> registerDiscernmentPotion(String name, int duration) {
         return POTIONS.register(name, () -> new Potion(new MobEffectInstance(DISCERNMENT_EFFECT.get(), duration)));
     }
 
     @SubscribeEvent
-    public static void discern(LivingAttackEvent event)
-    {
+    public static void discern(LivingAttackEvent event) {
         LivingEntity target = event.getEntityLiving();
         if (!target.getType().getCategory().isFriendly())
             return;
@@ -145,33 +138,27 @@ public class Discernment
         return Optional.of(value);
     }
 
-    private static class DiscernmentEnchantment extends Enchantment
-    {
-        protected DiscernmentEnchantment()
-        {
+    private static class DiscernmentEnchantment extends Enchantment {
+        protected DiscernmentEnchantment() {
             super(Rarity.UNCOMMON, EnchantmentCategory.VANISHABLE, EquipmentSlot.values());
         }
     }
 
-    private static class DiscernmentEffect extends MobEffect
-    {
+    private static class DiscernmentEffect extends MobEffect {
         private final Stopwatch timer;
         private static final int CYCLE_TIME = 2000;
-        private static final int[] COLORS = IntStream.range(0, CYCLE_TIME).map(i ->
-        {
+        private static final int[] COLORS = IntStream.range(0, CYCLE_TIME).map(i -> {
             int value = Math.max(1, (int)((Math.sin((i % CYCLE_TIME) / (double) CYCLE_TIME * 2 * Math.PI) / 2 + 0.5) * 255 + 0.5));
             return (value << 16) | (value << 8) | value;
         }).toArray();
 
-        protected DiscernmentEffect()
-        {
+        protected DiscernmentEffect() {
             super(MobEffectCategory.BENEFICIAL, 0);
             timer = Stopwatch.createStarted();
         }
 
         @Override
-        public int getColor()
-        {
+        public int getColor() {
             return COLORS[(int) (timer.elapsed(TimeUnit.MILLISECONDS) % CYCLE_TIME)];
         }
     }
