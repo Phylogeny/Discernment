@@ -34,16 +34,16 @@ public class Config {
     }
 
     public static class Server {
-        private static final String translationKeyBase = getTranslationKeyBase("server");
+        private static final String TRANSLATION_KEY_BASE = getTranslationKeyBase("server");
         private static final Builder BUILDER = new Builder();
-        public static final Particles PARTICLES = new Particles(translationKeyBase);
-        public static final Sounds SOUNDS = new Sounds(translationKeyBase);
+        public static final Particles PARTICLES = new Particles();
+        public static final Sounds SOUNDS = new Sounds();
 
         public static class Particles extends RegistryNameList<ParticleType<?>> {
             public final IntValue directCount;
 
-            Particles(String translationKeyBase) {
-                super("Particles", "Configures the type and number of spawned particles", translationKeyBase,
+            Particles() {
+                super("Particles", "Configures the type and number of spawned particles", TRANSLATION_KEY_BASE,
                         "Spawned particles", "particles will spawn", "none will spawn",
                         "Note that only particle types which extends the ParticleOptions class are allowed. " +
                         "Rare examples of particles that don't do so are ones that require additional data (like a BlockState, " +
@@ -55,21 +55,21 @@ public class Config {
                                 "Otherwise, a fixed number of particles are spawned all around the target entity in the normal vanilla manner.",
                                 name -> builder.defineInRange(name, 15, 1, Integer.MAX_VALUE));
 
-                BUILDER.pop();
+                builder.pop();
             }
         }
 
         public static class Sounds extends RegistryNameList<SoundEvent> {
             public final SoundRange volume, pitch;
 
-            Sounds(String translationKeyBase) {
-                super("Sounds", "Configures the type, volume, and pitch of played sounds", translationKeyBase, "Played sounds",
+            Sounds() {
+                super("Sounds", "Configures the type, volume, and pitch of played sounds", TRANSLATION_KEY_BASE, "Played sounds",
                         "a sound will play", "none will play", "", ForgeRegistries.SOUND_EVENTS, "block.amethyst_cluster.fall", "block.amethyst_block.fall");
 
-                volume = new SoundRange("Volume", this.translationKeyBase, 1D, 1D);
+                volume = new SoundRange("Volume", this.translationKeyBase, 0.5D, 0.5D);
                 pitch = new SoundRange("Pitch", this.translationKeyBase, -1D, -1D);
 
-                BUILDER.pop();
+                builder.pop();
             }
 
             public static class SoundRange extends ConfigBase {
@@ -82,7 +82,7 @@ public class Config {
                     min = getMin(name, "Min", defaultMin);
                     max = getMin(name, "Max", defaultMax);
 
-                    BUILDER.pop();
+                    builder.pop();
                 }
 
                 private DoubleValue getMin(String name, String value, double defaultValue) {
@@ -184,7 +184,6 @@ public class Config {
 
     public static void register(IEventBus bus) {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER);
-        //bus.register(Config.class);
         bus.addListener(Config::onLoad);
     }
 }
