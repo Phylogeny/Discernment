@@ -1,5 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/discernment",
+  "1.18": {
+    "3.0.0": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.18.2/CHANGELOG.md"
+  },
+  "1.17": {
+    "3.0.0": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.17.1/CHANGELOG.md"
+  },
   "1.16": {
     "2.0.1": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.16.4/CHANGELOG.md"
   },
@@ -7,6 +13,10 @@
     "2.0.0": "Changelog: https://github.com/Phylogeny/Discernment/blob/1.15.2/CHANGELOG.md"
   },
   "promos": {
+    "1.18-latest": "3.0.0",
+    "1.18-recommended": "3.0.0",
+    "1.17-latest": "3.0.0",
+    "1.17-recommended": "3.0.0",
     "1.16-latest": "2.0.1",
     "1.16-recommended": "2.0.1",
     "1.15-latest": "2.0.0",
