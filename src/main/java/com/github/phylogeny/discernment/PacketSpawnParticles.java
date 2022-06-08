@@ -3,18 +3,18 @@ package com.github.phylogeny.discernment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public record PacketSpawnParticles(@Nullable Vec3 hit, int entityId) {
-    private static final Random RAND = new Random();
+    private static final RandomSource RAND = RandomSource.create();
 
     public static void encode(PacketSpawnParticles msg, FriendlyByteBuf buf) {
         buf.writeBoolean(msg.hit != null);
@@ -43,7 +43,7 @@ public record PacketSpawnParticles(@Nullable Vec3 hit, int entityId) {
                                 IntStream.range(0, Config.Server.PARTICLES.directCount.get()).forEach(i -> world.addParticle(particle, msg.hit.x, msg.hit.y, msg.hit.z,
                                         RAND.nextDouble() - 0.5, RAND.nextDouble() - 0.5, RAND.nextDouble() - 0.5));
                         else
-                            Discernment.LOGGER.error(String.format("%s does not implement ParticleOptions", type.getRegistryName()));
+                            Discernment.LOGGER.error(String.format("%s does not implement ParticleOptions", ForgeRegistries.PARTICLE_TYPES.getKey(type)));
                     })));
             ctx.get().setPacketHandled(true);
         }

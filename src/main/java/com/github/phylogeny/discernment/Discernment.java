@@ -3,6 +3,7 @@ package com.github.phylogeny.discernment;
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -124,12 +124,12 @@ public class Discernment {
     }
 
     @NotNull
-    public static <T extends IForgeRegistryEntry<T>> Optional<T> getRegistryValue(IForgeRegistry<T> registry, List<ResourceLocation> names, Random rand) {
+    public static <T> Optional<T> getRegistryValue(IForgeRegistry<T> registry, List<ResourceLocation> names, RandomSource rand) {
         return getRegistryValue(registry, names.get(rand.nextInt(names.size())));
     }
 
     @NotNull
-    public static <T extends IForgeRegistryEntry<T>> Optional<T> getRegistryValue(IForgeRegistry<T> registry, ResourceLocation name) {
+    public static <T> Optional<T> getRegistryValue(IForgeRegistry<T> registry, ResourceLocation name) {
         T value = registry.getValue(name);
         if (value == null) {
             LOGGER.error(String.format("%s is not a registered %s", name, registry.getRegistryName()));

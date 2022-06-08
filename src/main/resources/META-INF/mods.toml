@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[40,)"
+loaderVersion="[41,)"
 license="Public Domain"
 issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
 [[mods]]
@@ -15,12 +15,12 @@ issueTrackerURL="https://github.com/Phylogeny/Discernment/issues"
 [[dependencies.discernment]]
     modId="forge"
     mandatory=true
-    versionRange="[40,)"
+    versionRange="[41,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.discernment]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,)"
+    versionRange="[1.19,)"
     ordering="NONE"
     side="BOTH"

@@ -16,7 +16,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +96,7 @@ public class Config {
             }
         }
 
-        public static class RegistryNameList<T extends IForgeRegistryEntry<T>> extends ConfigBase {
+        public static class RegistryNameList<T> extends ConfigBase {
             private final ConfigValue<List<? extends String>> nameStrings;
             private final List<String> defaultNames;
             private List<ResourceLocation> names;
