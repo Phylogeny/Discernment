@@ -2,6 +2,9 @@ package com.github.phylogeny.discernment;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
@@ -20,24 +23,23 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.*;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry;
+import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 @Mod(Discernment.MOD_ID)
@@ -46,16 +48,15 @@ public class Discernment {
     public static final String MOD_ID = "discernment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, MOD_ID);
-    private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, MOD_ID);
-    private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(ForgeRegistries.POTIONS, MOD_ID);
-    private static final RegistryObject<Enchantment> DISCERNMENT_ENCHANT = ENCHANTMENTS.register("discernment", DiscernmentEnchantment::new);
-    private static final RegistryObject<MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
-    private static final RegistryObject<Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
-    private static final RegistryObject<Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
+    private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(Registries.ENCHANTMENT, MOD_ID);
+    private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, MOD_ID);
+    private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(Registries.POTION, MOD_ID);
+    private static final Supplier<Enchantment> DISCERNMENT_ENCHANT = ENCHANTMENTS.register("discernment", DiscernmentEnchantment::new);
+    private static final Supplier<MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
+    private static final Supplier<Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
+    private static final Supplier<Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
 
-    public Discernment() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public Discernment(IEventBus bus) {
         Config.register(bus);
         ENCHANTMENTS.register(bus);
         EFFECTS.register(bus);
@@ -68,12 +69,11 @@ public class Discernment {
     }
 
     private void setup(FMLCommonSetupEvent event) {
-        PacketNetwork.registerPackets();
         addBrewingRecipe(Potions.AWKWARD, Items.EMERALD, DISCERNMENT_POTION);
         addBrewingRecipe(DISCERNMENT_POTION.get(), Items.REDSTONE, DISCERNMENT_POTION_LONG);
     }
 
-    private void addBrewingRecipe(Potion input, Item ingredient, RegistryObject<Potion> output) {
+    private void addBrewingRecipe(Potion input, Item ingredient, Supplier<Potion> output) {
         BrewingRecipeRegistry.addRecipe(Ingredient.of(getPotionStack(input)), Ingredient.of(ingredient), getPotionStack(output.get()));
     }
 
@@ -81,29 +81,29 @@ public class Discernment {
         return PotionUtils.setPotion(new ItemStack(Items.POTION), potion);
     }
 
-    private static RegistryObject<Potion> registerDiscernmentPotion(String name, int duration) {
+    private static Supplier<Potion> registerDiscernmentPotion(String name, int duration) {
         return POTIONS.register(name, () -> new Potion(new MobEffectInstance(DISCERNMENT_EFFECT.get(), duration)));
     }
 
     @SubscribeEvent
     public static void discern(LivingAttackEvent event) {
-        LivingEntity target = event.getEntityLiving();
+        LivingEntity target = event.getEntity();
         if (!target.getType().getCategory().isFriendly())
             return;
 
         Entity source = event.getSource().getEntity();
         if (!(source instanceof LivingEntity attacker) || attacker.isShiftKeyDown() || (!attacker.hasEffect(DISCERNMENT_EFFECT.get())
                 && DISCERNMENT_ENCHANT.get().getSlotItems(attacker).values().stream()
-                    .noneMatch(stack -> EnchantmentHelper.getItemEnchantmentLevel(DISCERNMENT_ENCHANT.get(), stack) > 0)))
+                    .noneMatch(stack -> stack.getEnchantmentLevel(DISCERNMENT_ENCHANT.get()) > 0)))
             return;
 
         event.setCanceled(true);
-        if (target.getLevel().isClientSide())
+        if (target.level().isClientSide())
             return;
 
         if (Config.Server.SOUNDS.enabled.get()) {
-            getRegistryValue(ForgeRegistries.SOUND_EVENTS, Config.Server.SOUNDS.getNames(), target.getRandom()).ifPresent(sound ->
-                    target.level.playSound(null, target.getX(), target.getY(), target.getZ(), sound, target.getSoundSource(),
+            getRegistryValue(BuiltInRegistries.SOUND_EVENT, Config.Server.SOUNDS.getNames(), target.getRandom()).ifPresent(sound ->
+                    target.level().playSound(null, target.getX(), target.getY(), target.getZ(), sound, target.getSoundSource(),
                             Config.Server.SOUNDS.volume.randomInRange(), Config.Server.SOUNDS.pitch.randomInRange()));
         }
         if (!Config.Server.PARTICLES.enabled.get())
@@ -124,15 +124,15 @@ public class Discernment {
     }
 
     @NotNull
-    public static <T> Optional<T> getRegistryValue(IForgeRegistry<T> registry, List<ResourceLocation> names, RandomSource rand) {
+    public static <T> Optional<T> getRegistryValue(Registry<T> registry, List<ResourceLocation> names, RandomSource rand) {
         return getRegistryValue(registry, names.get(rand.nextInt(names.size())));
     }
 
     @NotNull
-    public static <T> Optional<T> getRegistryValue(IForgeRegistry<T> registry, ResourceLocation name) {
-        T value = registry.getValue(name);
+    public static <T> Optional<T> getRegistryValue(Registry<T> registry, ResourceLocation name) {
+        T value = registry.get(name);
         if (value == null) {
-            LOGGER.error(String.format("%s is not a registered %s", name, registry.getRegistryName()));
+            LOGGER.error(String.format("%s is not a registered %s", name, registry.asLookup().key().location()));
             return Optional.empty();
         }
         return Optional.of(value);

@@ -1,75 +1,79 @@
 package com.github.phylogeny.discernment;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.util.LogicalSidedProvider;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
+@Mod.EventBusSubscriber(modid = Discernment.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class PacketNetwork {
-    private static int packetId = 0;
-    private static final SimpleChannel INSTANCE = NetworkRegistry.ChannelBuilder
-            .named(Discernment.getResourceLoc("channel_main"))
-            .clientAcceptedVersions(version -> true)
-            .serverAcceptedVersions(version -> true)
-            .networkProtocolVersion(() -> "1.0")
-            .simpleChannel();
+    @SubscribeEvent
+    public static void register(RegisterPayloadHandlerEvent event) {
+        IPayloadRegistrar registrar = event.registrar(Discernment.MOD_ID);
 
-    public static void registerPackets() {
         // Client side
-        registerMessage(PacketSpawnParticles.class, PacketSpawnParticles::encode, PacketSpawnParticles::decode, PacketSpawnParticles.Handler::handle);
+        registrar.play(PacketSpawnParticles.ID, PacketSpawnParticles::new, handler -> handler.client(PacketSpawnParticles::handle));
     }
 
-    public static <MSG> void sendToAllTrackingAndSelf(MSG msg, Entity entity) {
-        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), msg);
+    public static void reply(CustomPacketPayload msg, PlayPayloadContext context) {
+        context.replyHandler().send(msg);
     }
 
-    public static <MSG> void sendToAllTracking(MSG msg, Entity entity) {
-        INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), msg);
+    public static void sendToAllTrackingAndSelf(CustomPacketPayload msg, Entity entity) {
+        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(entity).send(msg);
     }
 
-    public static <MSG> void sendTo(MSG msg, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), msg);
+    public static void sendToAllTracking(CustomPacketPayload msg, Entity entity) {
+        PacketDistributor.TRACKING_ENTITY.with(entity).send(msg);
     }
 
-    public static <MSG> void sendToAll(MSG msg)
+    public static void sendTo(CustomPacketPayload msg, ServerPlayer player) {
+        PacketDistributor.PLAYER.with(player).send(msg);
+    }
+
+    public static void sendToAll(CustomPacketPayload msg)
     {
-        INSTANCE.send(PacketDistributor.ALL.noArg(), msg);
+        PacketDistributor.ALL.noArg().send(msg);
     }
 
-    public static <MSG> void sendToAllAround(MSG msg, Level world, BlockPos pos) {
+    public static void sendToAllAround(CustomPacketPayload msg, Level world, BlockPos pos) {
         sendToAllAround(msg, world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
-    public static <MSG> void sendToAllAround(MSG msg, Level world, Vec3 vec) {
+    public static void sendToAllAround(CustomPacketPayload msg, Level world, Vec3 vec) {
         sendToAllAround(msg, world, vec.x, vec.y, vec.z);
     }
 
-    public static <MSG> void sendToAllAround(MSG msg, Level world, double x, double y, double z) {
-        INSTANCE.send(PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(x, y, z, 128, world.dimension())), msg);
+    public static void sendToAllAround(CustomPacketPayload msg, Level world, double x, double y, double z) {
+        PacketDistributor.NEAR.with(new PacketDistributor.TargetPoint(x, y, z, 128, world.dimension())).send(msg);
     }
 
-    public static <MSG> void sendToDimension(MSG msg, ResourceKey<Level> dimension) {
-        INSTANCE.send(PacketDistributor.DIMENSION.with(() -> dimension), msg);
+    public static void sendToDimension(CustomPacketPayload msg, ResourceKey<Level> dimension) {
+        PacketDistributor.DIMENSION.with(dimension).send(msg);
     }
 
-    public static <MSG> void sendToServer(MSG msg)
+    public static void sendToServer(CustomPacketPayload msg)
     {
-        INSTANCE.send(PacketDistributor.SERVER.noArg(), msg);
+        PacketDistributor.SERVER.noArg().send(msg);
     }
 
-    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder,
-            Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
-        INSTANCE.registerMessage(packetId++, messageType, encoder, decoder, messageConsumer);
+    public static void enqueueServerWork(Runnable runnable) {
+        BlockableEventLoop<?> executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER);
+        if (!executor.isSameThread())
+            executor.submitAsync(runnable);
+        else
+            runnable.run();
     }
 }
