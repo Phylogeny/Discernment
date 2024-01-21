@@ -17,6 +17,10 @@
     "item.minecraft.tipped_arrow.effect.long_discernment": "Arrow of Discernment",
 
     "_comment": "Server Configs",
+    "config.discernment.server.enchantment": "Enchantment",
+    "config.discernment.server.enchantment.tooltip": "Configures the discernment enchantment",
+    "config.discernment.server.enchantment.enchanting_table": "Available In Enchanting Table",
+    "config.discernment.server.enchantment.enchanting_table.tooltip": "Specifies whether discernment shows up as a possible enchantment in an enchanting table.",
     "config.discernment.server.particles": "Particles",
     "config.discernment.server.particles.tooltip": "Configures the type and number of spawned particles",
     "config.discernment.server.particles.enabled": "Enabled",

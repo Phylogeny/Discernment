@@ -36,6 +36,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -138,9 +139,16 @@ public class Discernment {
         return Optional.of(value);
     }
 
+    @ParametersAreNonnullByDefault
     private static class DiscernmentEnchantment extends Enchantment {
         protected DiscernmentEnchantment() {
             super(Rarity.UNCOMMON, EnchantmentCategory.VANISHABLE, EquipmentSlot.values());
+        }
+
+        @Override
+        public boolean canApplyAtEnchantingTable(ItemStack stack) {
+            return Config.Server.ENCHANTMENT.availableInEnchantingTable.get()
+                    && super.canApplyAtEnchantingTable(stack);
         }
     }
 

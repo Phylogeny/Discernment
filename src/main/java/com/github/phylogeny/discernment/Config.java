@@ -37,8 +37,23 @@ public class Config {
     public static class Server {
         private static final String TRANSLATION_KEY_BASE = getTranslationKeyBase("server");
         private static final Builder BUILDER = new Builder();
+        public static final Enchantment ENCHANTMENT = new Enchantment();
         public static final Particles PARTICLES = new Particles();
         public static final Sounds SOUNDS = new Sounds();
+
+        public static class Enchantment extends ConfigBase {
+            public final BooleanValue availableInEnchantingTable;
+
+            Enchantment() {
+                super("Enchantment", "Configures the discernment enchantment", TRANSLATION_KEY_BASE, BUILDER);
+
+                availableInEnchantingTable = define("Available In Enchanting Table", "enchanting_table",
+                        "Specifies whether discernment shows up as a possible enchantment in an enchanting table.",
+                        name -> builder.define(name, true));
+
+                builder.pop();
+            }
+        }
 
         public static class Particles extends RegistryNameList<ParticleType<?>> {
             public final IntValue directCount;
