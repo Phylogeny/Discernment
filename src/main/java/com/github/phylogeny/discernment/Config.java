@@ -31,10 +31,11 @@ import java.util.regex.PatternSyntaxException;
 @Mod.EventBusSubscriber(modid = Discernment.MOD_ID, value = Dist.CLIENT)
 public class Config {
     private static final boolean GENERATE_LANG_FILE_LINES = !FMLEnvironment.production;
+    private static String langFileLines = "";
 
     private static String getTranslationKeyBase(String name) {
         if (GENERATE_LANG_FILE_LINES)
-            System.out.printf("\"_comment\": \"%s Configs\",%n", name.toUpperCase().charAt(0) + name.substring(1).toLowerCase());
+            langFileLines += String.format("\"_comment\": \"%s Configs\",%n", name.toUpperCase().charAt(0) + name.substring(1).toLowerCase());
 
         return String.join(".", "config", Discernment.MOD_ID, name.toLowerCase()) + ".";
     }
@@ -306,7 +307,7 @@ public class Config {
         }
 
         private void printLangLine(String translationKey, String comment) {
-            System.out.println("\"" + translationKey + "\": \"" + comment + "\",");
+            langFileLines += String.format("\"%s\": \"%s\",%n", translationKey, comment);
         }
     }
 
@@ -331,5 +332,7 @@ public class Config {
     public static void register(IEventBus bus) {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER);
         bus.addListener(Config::onLoad);
+        if (GENERATE_LANG_FILE_LINES)
+            System.out.println(langFileLines);
     }
 }
