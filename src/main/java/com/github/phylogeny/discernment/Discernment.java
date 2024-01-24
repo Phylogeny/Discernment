@@ -13,6 +13,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -88,14 +90,27 @@ public class Discernment {
 
     @SubscribeEvent
     public static void discern(LivingAttackEvent event) {
-        LivingEntity target = event.getEntity();
-        if (!target.getType().getCategory().isFriendly())
+        Entity source = event.getSource().getEntity();
+        if (!(source instanceof LivingEntity attacker)
+                || attacker.isShiftKeyDown()
+                || (!attacker.hasEffect(DISCERNMENT_EFFECT.get())
+                        && DISCERNMENT_ENCHANT.get().getSlotItems(attacker).values().stream()
+                            .noneMatch(stack -> stack.getEnchantmentLevel(DISCERNMENT_ENCHANT.get()) > 0)))
             return;
 
-        Entity source = event.getSource().getEntity();
-        if (!(source instanceof LivingEntity attacker) || attacker.isShiftKeyDown() || (!attacker.hasEffect(DISCERNMENT_EFFECT.get())
-                && DISCERNMENT_ENCHANT.get().getSlotItems(attacker).values().stream()
-                    .noneMatch(stack -> stack.getEnchantmentLevel(DISCERNMENT_ENCHANT.get()) > 0)))
+        LivingEntity target = event.getEntity();
+        if ((Config.Server.FUNCTIONALITY.protection.namedEntityBlacklist.useNamePattern()
+                && Optional.ofNullable(target.getCustomName())
+                    .filter(Config.Server.FUNCTIONALITY.protection.namedEntityBlacklist::namePatternMatches)
+                    .isPresent())
+                || ((target instanceof Player
+                        ? !Config.Server.FUNCTIONALITY.protection.protectPlayers.get()
+                        : (!Config.Server.FUNCTIONALITY.protection.protectPeacefulMobs.get() || !target.getType().getCategory().isFriendly()))
+                    && (!(target instanceof OwnableEntity ownable) || !attacker.getUUID().equals(ownable.getOwnerUUID()))
+                    && (!Config.Server.FUNCTIONALITY.protection.namedEntityWhitelist.useNamePattern()
+                        || Optional.ofNullable(target.getCustomName())
+                            .filter(Config.Server.FUNCTIONALITY.protection.namedEntityWhitelist::namePatternMatches)
+                            .isEmpty())))
             return;
 
         event.setCanceled(true);
@@ -147,7 +162,7 @@ public class Discernment {
 
         @Override
         public boolean canApplyAtEnchantingTable(ItemStack stack) {
-            return Config.Server.ENCHANTMENT.availableInEnchantingTable.get()
+            return Config.Server.FUNCTIONALITY.availableInEnchantingTable.get()
                     && super.canApplyAtEnchantingTable(stack);
         }
     }
