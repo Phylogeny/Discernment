@@ -1,6 +1,17 @@
 # Discernment Changelog
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 6-27-2024
+### Changed
+- Ported to MC 1.21
+- The discernment enchantment, as well as the enchantment tag it falls under, are now specified by fully configurable `.json` files found in `resources/data` folders. See the online Minecraft Wiki for information on configuring them.
+### Removed
+- The now obsolete config for removing the discernment enchantment from enchanting tables
+  - This can now be accomplished by setting the primary items to an empty list. Do this by opening `Discernment-1.21-6.0.0.jar` in the `mods` folder and adding the line `"primary_items": []` in `data/discernment/enchantment/discernment.json`.
+  - Setting the primary items to an item or item tag (or to a list of items and/or item tags) that is a subset of the set of all items that the enchantment can be applied to (specified by `"supported_items"`) will result in only those primary items being available in enchanting tables. The remaining items will only be able to be enchanted via anvils.
+  - The primary items must be a subset of the supported items, and refraining from specifying any primary items (as is the default) will result in all supported items being available in both enchanting tables and anvils.
+  - Again, see the online Minecraft Wiki for more information.
+
 ## [5.0.0] - 1-24-2024
 ### Changed
 - Ported to MC 1.20.4
