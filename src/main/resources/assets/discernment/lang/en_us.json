@@ -19,8 +19,6 @@
     "_comment": "Server Configs",
     "config.discernment.server.functionality": "Functionality",
     "config.discernment.server.functionality.tooltip": "Configures functionality of the discernment effect/enchantment",
-    "config.discernment.server.functionality.enchanting_table": "Available In Enchanting Table",
-    "config.discernment.server.functionality.enchanting_table.tooltip": "Specifies whether the discernment enchantment shows up as a possible enchantment in an enchanting table.",
     "config.discernment.server.functionality.protection": "Protection",
     "config.discernment.server.functionality.protection.tooltip": "Configures the creative for determining which entities are protected by the discernment effect/enchantment",
     "config.discernment.server.functionality.protection.blacklist_named_entities": "Blacklist Named Entities",

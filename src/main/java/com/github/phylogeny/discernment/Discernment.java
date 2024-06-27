@@ -2,100 +2,97 @@ package com.github.phylogeny.discernment;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 @Mod(Discernment.MOD_ID)
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class Discernment {
     public static final String MOD_ID = "discernment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(Registries.ENCHANTMENT, MOD_ID);
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, MOD_ID);
     private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(Registries.POTION, MOD_ID);
-    private static final Supplier<Enchantment> DISCERNMENT_ENCHANT = ENCHANTMENTS.register("discernment", DiscernmentEnchantment::new);
-    private static final Supplier<MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
-    private static final Supplier<Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
-    private static final Supplier<Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
+    private static final DeferredHolder<MobEffect, MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
+    private static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
+    private static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
+
+    public static final ResourceKey<Enchantment> DISCERNMENT_ENCHANT = ResourceKey.create(Registries.ENCHANTMENT, getResourceLoc("discernment"));
 
     public Discernment(IEventBus bus) {
         Config.register(bus);
-        ENCHANTMENTS.register(bus);
         EFFECTS.register(bus);
         POTIONS.register(bus);
-        bus.addListener(this::setup);
     }
 
     public static ResourceLocation getResourceLoc(String path) {
-        return new ResourceLocation(MOD_ID, path);
-    }
-
-    private void setup(FMLCommonSetupEvent event) {
-        addBrewingRecipe(Potions.AWKWARD, Items.EMERALD, DISCERNMENT_POTION);
-        addBrewingRecipe(DISCERNMENT_POTION.get(), Items.REDSTONE, DISCERNMENT_POTION_LONG);
-    }
-
-    private void addBrewingRecipe(Potion input, Item ingredient, Supplier<Potion> output) {
-        BrewingRecipeRegistry.addRecipe(Ingredient.of(getPotionStack(input)), Ingredient.of(ingredient), getPotionStack(output.get()));
-    }
-
-    private ItemStack getPotionStack(Potion potion) {
-        return PotionUtils.setPotion(new ItemStack(Items.POTION), potion);
-    }
-
-    private static Supplier<Potion> registerDiscernmentPotion(String name, int duration) {
-        return POTIONS.register(name, () -> new Potion(new MobEffectInstance(DISCERNMENT_EFFECT.get(), duration)));
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     @SubscribeEvent
-    public static void discern(LivingAttackEvent event) {
+    public static void registerBrewingRecipes(RegisterBrewingRecipesEvent event) {
+        PotionBrewing.Builder builder = event.getBuilder();
+        builder.addMix(Potions.AWKWARD, Items.EMERALD, DISCERNMENT_POTION);
+        builder.addMix(DISCERNMENT_POTION, Items.REDSTONE, DISCERNMENT_POTION_LONG);
+    }
+
+    private static DeferredHolder<Potion, Potion> registerDiscernmentPotion(String name, int duration) {
+        return POTIONS.register(name, () -> new Potion(new MobEffectInstance(DISCERNMENT_EFFECT, duration)));
+    }
+
+    @SubscribeEvent
+    public static void discern(LivingIncomingDamageEvent event) {
         Entity source = event.getSource().getEntity();
         if (!(source instanceof LivingEntity attacker)
                 || attacker.isShiftKeyDown()
-                || (!attacker.hasEffect(DISCERNMENT_EFFECT.get())
-                        && DISCERNMENT_ENCHANT.get().getSlotItems(attacker).values().stream()
-                            .noneMatch(stack -> stack.getEnchantmentLevel(DISCERNMENT_ENCHANT.get()) > 0)))
+                || (!attacker.hasEffect(DISCERNMENT_EFFECT)
+                        && attacker.level()
+                            .holderLookup(Registries.ENCHANTMENT)
+                            .get(DISCERNMENT_ENCHANT).stream().anyMatch(enchantReference -> {
+                                Holder<Enchantment> discernmentEnchantHolder = enchantReference.getDelegate();
+                                Enchantment discernmentEnchant = enchantReference.value();
+                                return discernmentEnchant.getSlotItems(attacker).values().stream()
+                                    .noneMatch(stack -> stack.getEnchantmentLevel(discernmentEnchantHolder) > 0);
+                            })
+                )
+        )
             return;
 
         LivingEntity target = event.getEntity();
@@ -126,7 +123,8 @@ public class Discernment {
             return;
 
         if (attacker != event.getSource().getDirectEntity()) {
-            PacketNetwork.sendToAllTrackingAndSelf(new PacketSpawnParticles(null, target.getId()), target);
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(target,
+                    new PacketSpawnParticles(Optional.empty(), target.getId()));
             return;
         }
         Vec3 eyes = attacker.getEyePosition();
@@ -136,7 +134,8 @@ public class Discernment {
         AABB box = attacker.getBoundingBox().minmax(target.getBoundingBox()).inflate(target.getPickRadius());
         EntityHitResult result = ProjectileUtil.getEntityHitResult(attacker, eyes, forward, box,
                 entity -> entity.getUUID().equals(target.getUUID()), distance * distance);
-        PacketNetwork.sendToAllTrackingAndSelf(new PacketSpawnParticles(result == null ? null : result.getLocation(), target.getId()), target);
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target,
+                new PacketSpawnParticles(result == null ? Optional.empty() : Optional.of(result.getLocation()), target.getId()));
     }
 
     @NotNull
@@ -152,19 +151,6 @@ public class Discernment {
             return Optional.empty();
         }
         return Optional.of(value);
-    }
-
-    @ParametersAreNonnullByDefault
-    private static class DiscernmentEnchantment extends Enchantment {
-        protected DiscernmentEnchantment() {
-            super(Rarity.UNCOMMON, EnchantmentCategory.VANISHABLE, EquipmentSlot.values());
-        }
-
-        @Override
-        public boolean canApplyAtEnchantingTable(ItemStack stack) {
-            return Config.Server.FUNCTIONALITY.availableInEnchantingTable.get()
-                    && super.canApplyAtEnchantingTable(stack);
-        }
     }
 
     private static class DiscernmentEffect extends MobEffect {

@@ -13,7 +13,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -28,7 +28,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-@Mod.EventBusSubscriber(modid = Discernment.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Discernment.MOD_ID, value = Dist.CLIENT)
 public class Config {
     private static final boolean GENERATE_LANG_FILE_LINES = !FMLEnvironment.production;
     private static String langFileLines = "";
@@ -66,15 +66,10 @@ public class Config {
         public static final Sounds SOUNDS = new Sounds();
 
         public static class Functionality extends ConfigBase {
-            public final BooleanValue availableInEnchantingTable;
             public final Protection protection;
 
             Functionality() {
                 super("Functionality", "Configures functionality of the discernment effect/enchantment", TRANSLATION_KEY_BASE, BUILDER);
-
-                availableInEnchantingTable = define("Available In Enchanting Table", "enchanting_table",
-                        "Specifies whether the discernment enchantment shows up as a possible enchantment in an enchanting table.",
-                        name -> builder.define(name, true));
 
                 protection = new Protection(translationKeyBase);
 
@@ -271,11 +266,11 @@ public class Config {
             }
 
             public void processNames() {
-                names = nameStrings.get().stream().map(ResourceLocation::new)
+                names = nameStrings.get().stream().map(ResourceLocation::parse)
                         .filter(name -> Discernment.getRegistryValue(registry, name).isPresent()).toList();
                 if (names.isEmpty()) {
                     Discernment.LOGGER.error(String.format("Reverting to %s default values", registry.asLookup().key().location()));
-                    names = defaultNames.stream().map(ResourceLocation::new).toList();
+                    names = defaultNames.stream().map(ResourceLocation::parse).toList();
                 }
             }
         }
@@ -330,7 +325,7 @@ public class Config {
     private static final ModConfigSpec SERVER = Server.BUILDER.build();
 
     public static void register(IEventBus bus) {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER);
+        ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.SERVER, SERVER);
         bus.addListener(Config::onLoad);
         if (GENERATE_LANG_FILE_LINES)
             System.out.println(langFileLines);
