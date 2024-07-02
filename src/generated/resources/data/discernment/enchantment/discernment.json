@@ -3,6 +3,20 @@
   "description": {
     "translate": "enchantment.discernment.discernment"
   },
+  "effects": {
+    "minecraft:tick": [
+      {
+        "effect": {
+          "type": "minecraft:apply_mob_effect",
+          "max_amplifier": 0.0,
+          "max_duration": 1.5,
+          "min_amplifier": 0.0,
+          "min_duration": 1.5,
+          "to_apply": "discernment:discernment"
+        }
+      }
+    ]
+  },
   "max_cost": {
     "base": 41,
     "per_level_above_first": 0

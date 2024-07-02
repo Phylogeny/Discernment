@@ -2,7 +2,6 @@ package com.github.phylogeny.discernment;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -50,9 +49,9 @@ public class Discernment {
 
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, MOD_ID);
     private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(Registries.POTION, MOD_ID);
-    private static final DeferredHolder<MobEffect, MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
-    private static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
-    private static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
+    public static final DeferredHolder<MobEffect, MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
+    public static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
+    public static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
 
     public static final ResourceKey<Enchantment> DISCERNMENT_ENCHANT = ResourceKey.create(Registries.ENCHANTMENT, getResourceLoc("discernment"));
 
@@ -82,17 +81,7 @@ public class Discernment {
         Entity source = event.getSource().getEntity();
         if (!(source instanceof LivingEntity attacker)
                 || attacker.isShiftKeyDown()
-                || (!attacker.hasEffect(DISCERNMENT_EFFECT)
-                        && attacker.level()
-                            .holderLookup(Registries.ENCHANTMENT)
-                            .get(DISCERNMENT_ENCHANT).stream().anyMatch(enchantReference -> {
-                                Holder<Enchantment> discernmentEnchantHolder = enchantReference.getDelegate();
-                                Enchantment discernmentEnchant = enchantReference.value();
-                                return discernmentEnchant.getSlotItems(attacker).values().stream()
-                                    .noneMatch(stack -> stack.getEnchantmentLevel(discernmentEnchantHolder) > 0);
-                            })
-                )
-        )
+                || !attacker.hasEffect(DISCERNMENT_EFFECT))
             return;
 
         LivingEntity target = event.getEntity();
