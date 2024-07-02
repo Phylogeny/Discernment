@@ -12,7 +12,6 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.LevelBasedValue;
-import net.minecraft.world.item.enchantment.effects.ApplyMobEffect;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.Tags;
@@ -62,7 +61,7 @@ public class ModDataGeneration {
                                         )
                                         .withEffect(
                                                 EnchantmentEffectComponents.TICK,
-                                                new ApplyMobEffect(
+                                                new ApplyHiddenMobEffect(
                                                         HolderSet.direct(Discernment.DISCERNMENT_EFFECT),
                                                         LevelBasedValue.constant(1.5F),
                                                         LevelBasedValue.constant(1.5F),

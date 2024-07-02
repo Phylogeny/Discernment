@@ -2,6 +2,7 @@ package com.github.phylogeny.discernment;
 
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -47,8 +49,12 @@ public class Discernment {
     public static final String MOD_ID = "discernment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    private static final DeferredRegister<MapCodec<? extends EnchantmentEntityEffect>> ENCHANTMENT_ENTITY_EFFECT_TYPES =
+            DeferredRegister.create(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, MOD_ID);
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, MOD_ID);
     private static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(Registries.POTION, MOD_ID);
+    public static final DeferredHolder<MapCodec<? extends EnchantmentEntityEffect>, MapCodec<? extends EnchantmentEntityEffect>> APPLY_HIDDEN_MOB_EFFECT =
+            ENCHANTMENT_ENTITY_EFFECT_TYPES.register("apply_hidden_mob_effect", () -> ApplyHiddenMobEffect.CODEC);
     public static final DeferredHolder<MobEffect, MobEffect> DISCERNMENT_EFFECT = EFFECTS.register("discernment", DiscernmentEffect::new);
     public static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION = registerDiscernmentPotion("discernment", 3600);
     public static final DeferredHolder<Potion, Potion> DISCERNMENT_POTION_LONG = registerDiscernmentPotion("long_discernment", 9600);
@@ -57,6 +63,7 @@ public class Discernment {
 
     public Discernment(IEventBus bus) {
         Config.register(bus);
+        ENCHANTMENT_ENTITY_EFFECT_TYPES.register(bus);
         EFFECTS.register(bus);
         POTIONS.register(bus);
     }

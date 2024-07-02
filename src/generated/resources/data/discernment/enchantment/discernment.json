@@ -7,7 +7,7 @@
     "minecraft:tick": [
       {
         "effect": {
-          "type": "minecraft:apply_mob_effect",
+          "type": "discernment:apply_hidden_mob_effect",
           "max_amplifier": 0.0,
           "max_duration": 1.5,
           "min_amplifier": 0.0,
